@@ -30,8 +30,10 @@ public class BloomFilter {
         this.filterArray = new boolean[m];
         this.filterWords = new String[m];
 
-        //k = round((m / n) * log(2));
+        //k = -(log(p) * log(2));
         this.k = -(int)(Math.log(p) / Math.log(2));
+
+        if (k < 1) this.k = 1;
 
         for (int i = 0; i < k; i++) {
             hashFunctionList.add(Hashing.murmur3_128(i));

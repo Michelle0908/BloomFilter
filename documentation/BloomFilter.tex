@@ -10,7 +10,7 @@
 \usepackage{amsmath}
 
 \title{Bloom Filter}
-\author{Vonesch, Wächter, Sebrek}
+\author{Tobias Vonesch, Michelle Wächter, Aleks Sebrek}
 
 % Document
 \begin{document}
@@ -41,8 +41,40 @@
     \section{Beispiel aus der Praxis}
 
     \section{Fehlerwahrscheinlichkeit}
+    In unserem Programm ist es m{\"o}glich eine Fehlerwahrscheinlichkeit P vorzugeben.
+    Mithilfe dieses P und der Gr{\"o}sse des Datensatzes werden Filter und Anzahl Hashes berechnet.
+    Die Gr{\"o}sse des Filters wird mittels der Folgenden Formel bestimmt:
+
+     \begin{align*}
+        m = \frac{n * log(p)}{log(\frac{1}{2^{log(2)}})}
+    \end{align*}
+    \smallskip
+    m = die Gr{\"o}sse des Filters
+    \\
+    n = die Gr{\"o}sse des Datensatzes
+    \\
+    \\
+    Die Anzahl der Hashes wird mittels folgender Formel bestimmt:
+
+    \begin{align*}
+        k = -(log(p) * log(2))
+    \end{align*}
+    \smallskip
+    k = Anzahl der Hash-Funktionen (aber mindestens 1)
+    \\
+    p = gew{\"u}nschte Probabilit{\"a}t
+    \medskip
 
     \subsection{Test}
+    Um auszuwerten wie gut unser Filter funktioniert und wie hoch die effektive FalsePositive Rate ist,
+    haben wir einen zweiten, komplett verschiedenen Datensatz mit W{\"o}rtern der Niederl{\"a}ndischen Sprache zusammengesucht.
+    So l{\"a}sst sich einfach sagen, dass jedes Positive ein FalsePositive sein muss. Der zweite Datensatz ist {\"u}berdies um einiges
+    gr{\"o}sser als der vorgegebene. Um die Effektivit{\"a}t zu messen, teilen wir also einfach die Anzahl FalsePositives durch die Anzahl
+    Testw{\"o}rter.
+
+    \begin{align*}
+    (\frac{False Positives}{Anzahl Woerter})
+    \end{align*}
 
     \subsection{Resultate}
 
