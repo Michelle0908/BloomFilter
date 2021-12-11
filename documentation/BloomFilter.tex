@@ -3,12 +3,10 @@
 
 % Preamble
 \documentclass[11pt]{article}
-\usepackage[letterpaper,top=2cm,bottom=2cm,left=2cm,right=2cm,marginparwidth=1.75cm]{geometry}
-
+\usepackage[letterpaper,top=1.5cm,bottom=2cm,left=2cm,right=2cm,marginparwidth=1.75cm]{geometry}
 
 % Packages
 \usepackage{amsmath}
-
 \title{Bloom Filter}
 \author{Tobias Vonesch, Michelle Wächter, Aleks Sebrek}
 
@@ -20,12 +18,12 @@
 
     Ein Bloom-Filter ist eine, auf Hashing basierende probabilistische Datenstruktur.
     Er wird in der Regel verwendet, um Elemente zu einer Menge hinzuzuf{\"u}gen und zu pr{\"u}fen, ob ein Element in einer Menge enthalten ist, da er extrem Platzsparend ist.
-    Nicht die Elemente selbst werden zu einer Menge hinzugef{\"u}gt, sondern der Hash der Elemente. \\
-
+    Nicht die Elemente selbst werden zu einer Menge hinzugef{\"u}gt, sondern der Hash der Elemente.
+    \smallskip
     Bei der {\"U}berpr{\"u}fung, ob ein Element im Bloom-Filter enthalten ist, ist es m{\"o}glich false positives zu erhalten.
     Entweder stellt man fest, dass ein Element definitiv nicht in der Menge enthalten ist, oder dass es m{\"o}glich ist, dass das Element in der Menge enthalten ist.
-    Wenn der Bloom-Filter allerdings sagt, dass das Element nicht in der Datenstruktur enthalten ist, ist es ganz bestimmt nicht darin enthalten.\\
-
+    Wenn der Bloom-Filter allerdings sagt, dass das Element nicht in der Datenstruktur enthalten ist, ist es ganz bestimmt nicht darin enthalten.
+    \smallskip
     Ein Bloom-Filter {\"a}hnelt einer Hash-Tabelle, da er eine Hash-Funktion verwendet, um einen Schl{\"u}ssel einem Bucket zuzuordnen.
     Er speichert diesen Schl{\"u}ssel jedoch nicht in diesem Bereich, sondern markiert ihn lediglich als gef{\"u}llt.
     So k{\"o}nnen viele Schl{\"u}ssel demselben gef{\"u}llten Bucket zugeordnet werden, was zu falsch positiven Ergebnissen f{\"u}hrt.
@@ -33,6 +31,26 @@
     \subsection{Anforderung Hash-Funktion}
     Die in einem Bloom-Filter verwendeten Hash-Funktionen sollten unabh{\"a}ngig und gleichm{\"a}ssig verteilt sein.
     Sie sollten ausserdem so schnell wie mo{\"o}lich sein (kryptografische Hash-Funktionen wie sha1, sind daher keine gute Wahl).
+
+    \subsection{Grösse Bloom-Filter}
+    Eine Eigenschaft von Bloom-Filtern ist, dass man die Falsch-Positiv-Rate des Filters ver{\"a}ndern kann.
+    Ein gr{\"o}sserer Filter hat weniger falsch-positive Ergebnisse, ein kleinerer daf{\"u}r mehr.
+    Die Falsch-Positiv-Rate betr{\"a}gt ungef{\"a}hr:
+    \begin{align*}
+    (1-e^{-kn/m})^k
+    \end{align*}
+    Man kann also die Anzahl n der Elemente eingeben, die eingef{\"u}t werden sollen, und verschiedene Werte f{\"u}r k und m ausprobieren, um den Filter zu konfigurieren.
+
+    \subsection{Anzahl Hashfunktionen}
+    Je mehr Hash-Funktionen, desto langsamer ist der Bloom-Filter und desto schneller f{\"u}llt er sich.
+    Wenn man jedoch zu wenige hat, kann es zu vielen falsch positiven Ergebnissen kommen.
+    \smallskip
+    Da bei der Erstellung des Filters k gew{\"a}hlt werden muss, muss vorher abgesch{\"a}tzt werden, in welchem Bereich n erwartet wird.
+    Danach muss ein noch m und k gew{\"a}hlt werden.\\
+    F{\"u}r dieses Optimierungsproblem gibt es f{\"u}r m eine Funktion, mit der man den optimalen Wert k ermitteln kann: \\
+    \begin{align*}
+    (\frac{m}{n})\left ln2
+    \end{align*}
 
     \subsection{Vorteile}
     Eines der Hauptvorteile ist, dass Hashfunktionen Simultan berechnet werden k{\"o}nnen.
@@ -85,6 +103,36 @@
 
     \newpage
     \subsection{Resultate}
+    Wir haben festgestellt, dass der Algorithmus ziemlich gut f{\"u}r Werte bis und mit 0.1 funktioniert.
+    Danach wird er leider immer ungenauer und kommt nicht mehr an das vorgegebene P heran, siehe Tabelle:
+
+    \begin{table}[htp]
+        \label{tab:summary}
+        \begin{center}
+            \begin{tabular}{ccccc}
+                \hline
+                &                 &             &Nummer     \\
+                Selected P  & Actual P        & Filter Size &Hash       \\
+                &                 &             &Functions	\\
+                \hline
+
+                0.9         & 0.9900          &  12743       & 1  	\\
+                0.7         & 0.7469          &  43139       & 1  	\\
+                0.5         & 0.5116          &  83835       & 1  	\\
+                0.3         & 0.3499          &  145618      & 1  	\\
+                0.1         & 0.1224          &  278493      & 3  	\\
+                0.09        & 0.1122          &  291237      & 3  	\\
+                0.05        & 0.0745          &  362328      & 4    \\
+                0.03        & 0.0543          &  424112      & 5  	\\
+                0.01        & 0.0345          &  556987      & 6  	\\
+                0.005       & 0.0294          &  640822      & 7  	\\
+                \hline
+            \end{tabular}
+            *Nummer of Hash-Functions
+        \end{center}
+        \caption{Die Filtergenauigkeit bei gleichem Datensatz aber anderem P}
+    \end{table}
+
 
 
 
