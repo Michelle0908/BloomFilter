@@ -35,10 +35,17 @@
     Sie sollten ausserdem so schnell wie mo{\"o}lich sein (kryptografische Hash-Funktionen wie sha1, sind daher keine gute Wahl).
 
     \subsection{Vorteile}
+    Eines der Hauptvorteile ist, dass Hashfunktionen Simultan berechnet werden k{\"o}nnen.
+    Zus{\"a}tzlich k{\"o}nnen alle Anfragen gleichzeitig gestellt werden, solange bis ein neues Element in die Datenbank geschrieben wird.
+    Ein weiterer Vorteil ist der geringe Overhead.
+
 
     \subsection{Nachteile}
+    Ein Nachteil k{\"o}nnte das Debugging des Systems sein in Verbindung mit der Konsistenz bei verteilten Anwendungn.
 
     \section{Beispiel aus der Praxis}
+    Der Webbrowser Google Chrome pflegt einen Bloomfilter mit den Signaturen gef{\"a}hrlicher Webseiten und {\"u}berpr{\"u}ft bei Eingabe einer URL, ob diese in diesem Filter enthalten ist.
+    Bei jeder URL-Anfrage, die {\"u}ber Chrome gestellt wird, erfolgt die URL-Validierung {\"u}ber den Google-Server, was zu einer zus{\"a}tzlichen Abh{\"a}ngigkeit von den Google-Servern, zu einer l{\"a}ngeren Netzwerklaufzeit und zu der Anforderung f{\"u}hrt, eine hohe Verf{\"u}gbarkeit zu gew{\"a}hrleisten, um die URLs f{\"u}r alle URLs zu validieren, die von Chrome-Browsern auf der ganzen Welt gesendet werden.
 
     \section{Fehlerwahrscheinlichkeit}
     In unserem Programm ist es m{\"o}glich eine Fehlerwahrscheinlichkeit P vorzugeben.
@@ -76,6 +83,7 @@
     (\frac{False Positives}{Anzahl Woerter})
     \end{align*}
 
+    \newpage
     \subsection{Resultate}
 
 
