@@ -15,6 +15,7 @@ public class Main {
         Scanner console                 = new Scanner(System.in);
 
         int numberOfFalsePositive       = 0;
+        int numberOfComparisonWords     = 0;
         /*
          * Create Filter
          */
@@ -51,11 +52,21 @@ public class Main {
                 if(bloomFilter.isInFilter(s)) {
                     numberOfFalsePositive++;
                 }
+                numberOfComparisonWords++;
             }
+            System.out.println("******************");
+            System.out.println("Results");
+            System.out.println("******************");
             System.out.println("Number of False Positives: " + numberOfFalsePositive);
+            System.out.println("Selected P = " + p);
+            double actualP = (double)numberOfFalsePositive / (double)numberOfComparisonWords;
+            System.out.println("Actual P = " + actualP);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+        System.out.println("******************");
+        System.out.println("Filter Stats");
+        System.out.println("******************");
         bloomFilter.getStats();
     }
 }
