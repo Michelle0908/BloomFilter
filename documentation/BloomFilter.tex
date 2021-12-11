@@ -13,14 +13,24 @@
 % Document
 \begin{document}
     \maketitle
-    \begin{abstract}
-        Your abstract.
-    \end{abstract}
 
     \section{Idee des Bloom-Filters}
 
-    Your introduction goes here!
+    Ein Bloom-Filter ist eine, auf Hashing basierende probabilistische Datenstruktur.
+    Er wird in der Regel verwendet, um Elemente zu einer Menge hinzuzuf{\"u}gen und zu pr{\"u}fen, ob ein Element in einer Menge enthalten ist, da er extrem Platzsparend ist.
+    Nicht die Elemente selbst werden zu einer Menge hinzugef{\"u}gt, sondern der Hash der Elemente. \\
 
+    Bei der {\"U}berpr{\"u}fung, ob ein Element im Bloom-Filter enthalten ist, ist es m{\"o}glich false positives zu erhalten.
+    Entweder stellt man fest, dass ein Element definitiv nicht in der Menge enthalten ist, oder dass es m{\"o}glich ist, dass das Element in der Menge enthalten ist.
+    Wenn der Bloom-Filter allerdings sagt, dass das Element nicht in der Datenstruktur enthalten ist, ist es ganz bestimmt nicht darin enthalten.\\
+
+    Ein Bloom-Filter {\"a}hnelt einer Hash-Tabelle, da er eine Hash-Funktion verwendet, um einen Schl{\"u}ssel einem Bucket zuzuordnen.
+    Er speichert diesen Schl{\"u}ssel jedoch nicht in diesem Bereich, sondern markiert ihn lediglich als gef{\"u}llt.
+    So k{\"o}nnen viele Schl{\"u}ssel demselben gef{\"u}llten Bucket zugeordnet werden, was zu falsch positiven Ergebnissen f{\"u}hrt.
+
+    \subsection{Anforderung Hash-Funktion}
+    Die in einem Bloom-Filter verwendeten Hash-Funktionen sollten unabh{\"a}ngig und gleichm{\"a}ssig verteilt sein.
+    Sie sollten ausserdem so schnell wie mo{\"o}lich sein (kryptografische Hash-Funktionen wie sha1, sind daher keine gute Wahl).
 
     \subsection{Vorteile}
 
