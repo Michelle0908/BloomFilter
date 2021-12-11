@@ -1,0 +1,170 @@
+%! Author vonesch, wächter,sebrek
+%! Date = 11.12.21
+
+% Preamble
+\documentclass[11pt]{article}
+\usepackage[letterpaper,top=1.5cm,bottom=2cm,left=2cm,right=2cm]{geometry}
+
+% Packages
+\usepackage{amsmath}
+\newdimen\headerwidth
+
+\newcommand{\MakeTop}{
+    \noindent
+    \begin{center}
+        \framebox{
+            \vbox{
+                \headerwidth=\textwidth
+                \advance\headerwidth by -0.22in
+                \vspace{1mm}
+                \hbox to \headerwidth {{\Large  Bloom Filter} \hfill 11.Dezember 2021}
+                \vspace{2mm}
+                \hbox to \headerwidth {Autoren: \hfill Tobias Vonesch, Michelle Wächter, Aleks Sebre }
+                \vspace{0.2mm}
+            }
+        }
+    \end{center}
+    \vspace*{0.2mm}}
+
+% Document
+\begin{document}
+    \MakeTop
+
+    \section{Idee des Bloom-Filters}
+
+    Ein Bloom-Filter ist eine, auf Hashing basierende probabilistische Datenstruktur.
+    Er wird in der Regel verwendet, um Elemente zu einer Menge hinzuzuf{\"u}gen und zu pr{\"u}fen, ob ein Element in einer Menge enthalten ist, da er extrem Platzsparend ist.
+    Nicht die Elemente selbst werden zu einer Menge hinzugef{\"u}gt, sondern der Hash der Elemente.
+    \smallskip
+    Bei der {\"U}berpr{\"u}fung, ob ein Element im Bloom-Filter enthalten ist, ist es m{\"o}glich false positives zu erhalten.
+    Entweder stellt man fest, dass ein Element definitiv nicht in der Menge enthalten ist, oder dass es m{\"o}glich ist, dass das Element in der Menge enthalten ist.
+    Wenn der Bloom-Filter allerdings sagt, dass das Element nicht in der Datenstruktur enthalten ist, ist es ganz bestimmt nicht darin enthalten.
+    \smallskip
+    Ein Bloom-Filter {\"a}hnelt einer Hash-Tabelle, da er eine Hash-Funktion verwendet, um einen Schl{\"u}ssel einem Bucket zuzuordnen.
+    Er speichert diesen Schl{\"u}ssel jedoch nicht in diesem Bereich, sondern markiert ihn lediglich als gef{\"u}llt.
+    So k{\"o}nnen viele Schl{\"u}ssel demselben gef{\"u}llten Bucket zugeordnet werden, was zu falsch positiven Ergebnissen f{\"u}hrt.
+
+    \subsection{Anforderung Hash-Funktion}
+    Die in einem Bloom-Filter verwendeten Hash-Funktionen sollten unabh{\"a}ngig und gleichm{\"a}ssig verteilt sein.
+    Sie sollten ausserdem so schnell wie mo{\"o}lich sein (kryptografische Hash-Funktionen wie sha1, sind daher keine gute Wahl).
+
+    \subsection{Grösse Bloom-Filter}
+    Eine Eigenschaft von Bloom-Filtern ist, dass man die Falsch-Positiv-Rate des Filters ver{\"a}ndern kann.
+    Ein gr{\"o}sserer Filter hat weniger falsch-positive Ergebnisse, ein kleinerer daf{\"u}r mehr.
+    Die Falsch-Positiv-Rate betr{\"a}gt ungef{\"a}hr:
+    \begin{align*}
+    (1-e^{-kn/m})^k
+    \end{align*}
+    Man kann also die Anzahl n der Elemente eingeben, die eingef{\"u}t werden sollen, und verschiedene Werte f{\"u}r k und m ausprobieren, um den Filter zu konfigurieren.
+
+    \subsection{Anzahl Hashfunktionen}
+    Je mehr Hash-Funktionen, desto langsamer ist der Bloom-Filter und desto schneller f{\"u}llt er sich.
+    Wenn man jedoch zu wenige hat, kann es zu vielen falsch positiven Ergebnissen kommen.
+    \smallskip
+    Da bei der Erstellung des Filters k gew{\"a}hlt werden muss, muss vorher abgesch{\"a}tzt werden, in welchem Bereich n erwartet wird.
+    Danach muss ein noch m und k gew{\"a}hlt werden.\\
+    F{\"u}r dieses Optimierungsproblem gibt es f{\"u}r m eine Funktion, mit der man den optimalen Wert k ermitteln kann: \\
+    \begin{align*}
+        k= (\frac{m}{n})\left ln2 (gerundet)
+    \end{align*}
+
+    \newpage
+    \subsection{Vor- und Nachteile}
+    \subsubsection{Vorteile}
+    \begin{itemize}
+        \item Hashfunktionen k{\"o}nnen Simultan berechnet werden
+        \item Anfragen k{\"o}nnen gleichzeitig gestellt werden, bis ein neues Element hinzugef{\"u}gt wird
+        \item geringer Overhead
+    \end{itemize}
+
+    \subsubsection{Nachteile}
+    \begin{itemize}
+        \item Zus{\"a}tzliche Datenstruktur notwendig, diese kann sehr gross werden
+        \item Hashwertberechnung bei jedem Schreib- und Lesevorgang
+    \end{itemize}
+
+
+    \section{Beispiel aus der Praxis}
+    Der Webbrowser Google Chrome verf{\"u}gt {\"u}ber einen Bloomfilter mit den Signaturen gef{\"a}hrlicher Webseiten und {\"u}berpr{\"u}ft bei Eingabe einer URL, ob diese in diesem Filter enthalten ist.
+    Bei jeder URL-Anfrage, die {\"u}ber Chrome gestellt wird, erfolgt die URL-Validierung {\"u}ber den Google-Server, was zu einer zus{\"a}tzlichen Abh{\"a}ngigkeit von den Google-Servern, zu einer l{\"a}ngeren Netzwerklaufzeit und zu der Anforderung f{\"u}hrt, eine hohe Verf{\"u}gbarkeit zu gew{\"a}hrleisten, um die URLs f{\"u}r alle URLs zu validieren, die von Chrome-Browsern auf der ganzen Welt gesendet werden.
+
+    \section{Fehlerwahrscheinlichkeit}
+    In unserem Programm ist es m{\"o}glich eine Fehlerwahrscheinlichkeit P vorzugeben.
+    Mithilfe dieses P und der Gr{\"o}sse des Datensatzes werden Filter und Anzahl Hashes berechnet.
+    Die Gr{\"o}sse des Filters wird mittels der Folgenden Formel bestimmt:
+
+    \begin{align*}
+        m = \frac{n * log(p)}{log(\frac{1}{2^{log(2)}})}
+    \end{align*}
+    \smallskip
+    m = die Gr{\"o}sse des Filters
+    \\
+    n = die Gr{\"o}sse des Datensatzes
+    \\
+    \\
+    Die Anzahl der Hashes wird mittels folgender Formel bestimmt:
+
+    \begin{align*}
+        k = -(log(p) * log(2))
+    \end{align*}
+    \smallskip
+    k = Anzahl der Hash-Funktionen (aber mindestens 1)
+    \\
+    p = gew{\"u}nschte Probabilit{\"a}t
+    \medskip
+
+    \subsection{Test}
+    Um auszuwerten wie gut unser Filter funktioniert und wie hoch die effektive FalsePositive Rate ist,
+    haben wir einen zweiten, komplett verschiedenen Datensatz mit W{\"o}rtern der Niederl{\"a}ndischen Sprache zusammengesucht.
+    So l{\"a}sst sich einfach sagen, dass jedes Positive ein FalsePositive sein muss. Der zweite Datensatz ist {\"u}berdies um einiges
+    gr{\"o}sser als der vorgegebene. Um die Effektivit{\"a}t zu messen, teilen wir also einfach die Anzahl FalsePositives durch die Anzahl
+    Testw{\"o}rter.
+
+    \begin{align*}
+    (\frac{False Positives}{Anzahl Woerter})
+    \end{align*}
+
+    \newpage
+    \subsection{Resultate}
+    Nach ausf{\"u}rlichen Tests haben wir festgestellt, dass der Algorithmus verh{\"a}ltnissm{\"a}ssig  gut f{\"u}r Werte gr{\"o}sser gleich 0.1 funktioniert.
+    \newline
+    Bei P = 0.9, 0.7, 0.5 betr{\"a}gt die Abweichung weniger als 10 Prozent.
+    \newline
+    Bei P = 0.3, 0.1, 0.09 liegt die Abweichung zwischen 10 und 20 Prozent.
+    \newline
+    Danach nimmt die genauigkeit ab und die Abweichung bei P = 0.005 liegt bei mehr als 80 Prozent.
+    \\
+    \\
+    Ersichtlich in folgender Tabelle:
+    \\
+
+    \begin{table}[htp]
+        \label{tab:summary}
+        \begin{center}
+            \begin{tabular}{ccccc}
+                \hline
+                &                 &             &Nummer     \\
+                Selected P  & Actual P        & Filter Size &Hash       \\
+                &                 &             &Functions	\\
+                \hline
+
+                0.9         & 0.9900          &  12743       & 1  	\\
+                0.7         & 0.7469          &  43139       & 1  	\\
+                0.5         & 0.5116          &  83835       & 1  	\\
+                0.3         & 0.3499          &  145618      & 1  	\\
+                0.1         & 0.1224          &  278493      & 3  	\\
+                0.09        & 0.1122          &  291237      & 3  	\\
+                0.05        & 0.0745          &  362328      & 4    \\
+                0.03        & 0.0543          &  424112      & 5  	\\
+                0.01        & 0.0345          &  556987      & 6  	\\
+                0.005       & 0.0294          &  640822      & 7  	\\
+                \hline
+            \end{tabular}
+        \end{center}
+        \caption{Die Filtergenauigkeit bei gleichem Datensatz aber anderem P}
+    \end{table}
+
+
+
+
+\end{document}
