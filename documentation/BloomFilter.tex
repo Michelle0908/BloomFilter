@@ -33,52 +33,67 @@
     Sie sollten ausserdem so schnell wie mo{\"o}lich sein (kryptografische Hash-Funktionen wie sha1, sind daher keine gute Wahl).
 
     \subsection{Grösse Bloom-Filter}
-    Eine Eigenschaft von Bloom-Filtern ist, dass man die Falsch-Positiv-Rate des Filters ver{\"a}ndern kann.
-    Ein gr{\"o}sserer Filter hat weniger falsch-positive Ergebnisse, ein kleinerer daf{\"u}r mehr.
-    Die Falsch-Positiv-Rate betr{\"a}gt ungef{\"a}hr:
+    Eine Eigenschaft von Bloom-Filtern ist, dass man die false positive-Rate des Filters ver{\"a}ndern kann.
+    \newline
+    Ein gr{\"o}sserer Filter sprich mehr Hash-Funktionen ist Speicher- und Rechenintensiver, ein kleiner Filter und somit weniger Hash-Funktionen ist daf{\"u}r fehleranf{\"a}lliger.
+    Es gilt je nach Anwendungszweck eine gute Balance zu finden.
+    \newline
+    Die false positive-Rate betr{\"a}gt ungef{\"a}hr:
     \begin{align*}
-    (1-e^{-kn/m})^k
+    P = (1-e^{-kn/m})^k
     \end{align*}
     Man kann also die Anzahl n der Elemente eingeben, die eingef{\"u}t werden sollen, und verschiedene Werte f{\"u}r k und m ausprobieren, um den Filter zu konfigurieren.
 
-    \subsection{Anzahl Hashfunktionen}
+    \subsection{Anzahl Hash-Funktionen}
     Je mehr Hash-Funktionen, desto langsamer ist der Bloom-Filter und desto schneller f{\"u}llt er sich.
-    Wenn man jedoch zu wenige hat, kann es zu vielen falsch positiven Ergebnissen kommen.
+    Wenn man jedoch zu wenige oder zu viele hat, kann es zu vielen false positives Ergebnissen kommen.
     \smallskip
-    Da bei der Erstellung des Filters k gew{\"a}hlt werden muss, muss vorher abgesch{\"a}tzt werden, in welchem Bereich n erwartet wird.
-    Danach muss ein noch m und k gew{\"a}hlt werden.\\
-    F{\"u}r dieses Optimierungsproblem gibt es f{\"u}r m eine Funktion, mit der man den optimalen Wert k ermitteln kann: \\
+    Da bei der Erstellung des Filters die Anzahl Hash-Funktionen k gew{\"a}hlt werden muss, muss vorher abgesch{\"a}tzt werden, in welchem Bereich Gr{\"o}sse Datensatz n erwartet wird.
+    F{\"u}r dieses Optimierungsproblem gibt es f{\"u}r m eine Funktion, mit der man den optimalen Wert k ermitteln kann:
     \begin{align*}
-    (\frac{m}{n})\left ln2
+    k = (\frac{m}{n})\left ln2
     \end{align*}
+    \newline
+    k = Anzahl Filter Funktionen
+    \newline
+    m = die Gr{\"o}sse des Filters
+    \newline
+    n = die Gr{\"o}sse des Datensatzes
+    \newline
+    \subsection{Vor- und Nachteile}
+    \subsubsection{Vorteile}
+    \begin{itemize}
+        \item Hash-Funktionen k{\"o}nnen Simultan berechnet werden
+        \item Anfragen k{\"o}nnen gleichzeitig gestellt werden, bis ein neues Element hinzugef{\"u}gt wird
+        \item geringer Overhead durch effiziente Datenstruktur (Array)
+    \end{itemize}
 
-    \subsection{Vorteile}
-    Eines der Hauptvorteile ist, dass Hashfunktionen Simultan berechnet werden k{\"o}nnen.
-    Zus{\"a}tzlich k{\"o}nnen alle Anfragen gleichzeitig gestellt werden, solange bis ein neues Element in die Datenbank geschrieben wird.
-    Ein weiterer Vorteil ist der geringe Overhead.
-
-
-    \subsection{Nachteile}
-    Ein Nachteil k{\"o}nnte das Debugging des Systems sein in Verbindung mit der Konsistenz bei verteilten Anwendungn.
+    \subsubsection{Nachteile}
+    \begin{itemize}
+        \item Zus{\"a}tzliche Datenstruktur notwendig, welche sehr gross werden kann
+        \item Hash-Wertberechnung bei jedem Schreib- und Lesevorgang
+    \end{itemize}
 
     \section{Beispiel aus der Praxis}
-    Der Webbrowser Google Chrome pflegt einen Bloomfilter mit den Signaturen gef{\"a}hrlicher Webseiten und {\"u}berpr{\"u}ft bei Eingabe einer URL, ob diese in diesem Filter enthalten ist.
-    Bei jeder URL-Anfrage, die {\"u}ber Chrome gestellt wird, erfolgt die URL-Validierung {\"u}ber den Google-Server, was zu einer zus{\"a}tzlichen Abh{\"a}ngigkeit von den Google-Servern, zu einer l{\"a}ngeren Netzwerklaufzeit und zu der Anforderung f{\"u}hrt, eine hohe Verf{\"u}gbarkeit zu gew{\"a}hrleisten, um die URLs f{\"u}r alle URLs zu validieren, die von Chrome-Browsern auf der ganzen Welt gesendet werden.
+    Der Webbrowser Google Chrome verf{\"u}gt {\"u}ber einen Bloomfilter mit den Signaturen gef{\"a}hrlicher Webseiten und {\"u}berpr{\"u}ft bei Eingabe einer URL, ob diese in diesem Filter enthalten ist.
+    Falls dies der Fall ist, wird dem User eine Warnung pr{\"a}sentiert, welche ihn {\"u}ber die potentielle Gef{\"a}hrlichkeit der zu besuchenden Website aufkl{\"a}ren soll.
 
     \section{Fehlerwahrscheinlichkeit}
-    In unserem Programm ist es m{\"o}glich eine Fehlerwahrscheinlichkeit P vorzugeben.
-    Mithilfe dieses P und der Gr{\"o}sse des Datensatzes werden Filter und Anzahl Hashes berechnet.
+    In unserem Programm ist es m{\"o}glich eine Fehlerwahrscheinlichkeit p vorzugeben.
+    Mithilfe des vorgegebenen p und der Gr{\"o}sse des Datensatzes werden Filter und Anzahl Hashes berechnet.
     Die Gr{\"o}sse des Filters wird mittels der Folgenden Formel bestimmt:
 
      \begin{align*}
         m = \frac{n * log(p)}{log(\frac{1}{2^{log(2)}})}
     \end{align*}
-    \smallskip
+    \newline
     m = die Gr{\"o}sse des Filters
-    \\
+    \newline
     n = die Gr{\"o}sse des Datensatzes
-    \\
-    \\
+    \newline
+    p = gew{\"u}nschte Probabilit{\"a}t
+    \medskip
+    \newline
     Die Anzahl der Hashes wird mittels folgender Formel bestimmt:
 
     \begin{align*}
@@ -98,14 +113,23 @@
     Testw{\"o}rter.
 
     \begin{align*}
-    (\frac{False Positives}{Anzahl Woerter})
+    P = (\frac{False Positives}{Anzahl Woerter})
     \end{align*}
 
     \newpage
     \subsection{Resultate}
-    Wir haben festgestellt, dass der Algorithmus ziemlich gut f{\"u}r Werte bis und mit 0.1 funktioniert.
-    Danach wird er leider immer ungenauer und kommt nicht mehr an das vorgegebene P heran, siehe Tabelle:
-
+    Nach ausf{\"u}rlichen Tests haben wir festgestellt, dass der Algorithmus verh{\"a}ltnissm{\"a}ssig  gut f{\"u}r p-Werte gr{\"o}sser gleich 0.1 funktioniert.
+    \newline
+    Bei P = 0.9, 0.7, 0.5 betr{\"a}gt die Abweichung weniger als 10\%.
+    \newline
+    Bei P kleiner als 0.1 wird die Abweichung immer gr{\"o}sser mit +80\% bei P = 0.03, +240\% bei P = 0.01 und +488\% bei P = 0.005.
+    \newline
+    Die Funktion von P flacht also deutlich ab.
+    \medskip
+    \newline
+    Ersichtlich in folgender Tabelle:
+    \newline
+    \medskip
     \begin{table}[htp]
         \label{tab:summary}
         \begin{center}
