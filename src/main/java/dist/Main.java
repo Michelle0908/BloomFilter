@@ -10,7 +10,7 @@ public class Main {
     public static void main(String[] args) {
         String filterWordsFilename      = "./words.txt";
         File filterFile                 = new File(filterWordsFilename);
-        String comparisonWordsFilename  = "./dutchWords.txt";
+        String comparisonWordsFilename  = "./dutchWords2.txt";
         File comparisonFile             = new File(comparisonWordsFilename);
         Scanner console                 = new Scanner(System.in);
 
